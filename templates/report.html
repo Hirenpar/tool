@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Audit Report - {{ results.domain }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom gradient-bg text-white">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="card-title mb-2">
+                                <i class="fas fa-chart-line"></i> SEO Audit Report
+                            </h1>
+                            <h3 class="mb-1">{{ results.domain }}</h3>
+                            <p class="mb-2">{{ results.url }}</p>
+                            <small class="opacity-75">
+                                <i class="fas fa-clock"></i> Audit completed: {{ results.audit_timestamp[:19] }}
+                            </small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('download_json', audit_id=audit_id) }}" 
+                                   class="btn btn-light btn-sm">
+                                    <i class="fas fa-download"></i> JSON
+                                </a>
+                                <a href="{{ url_for('download_csv', audit_id=audit_id) }}" 
+                                   class="btn btn-light btn-sm">
+                                    <i class="fas fa-file-csv"></i> CSV
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Scores -->
+    {% if results.scores %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Overall Scores</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for score_name, score_value in results.scores.items() %}
+                        {% if score_name != 'calculation_error' and score_value != 0 %}
+                        <div class="col-md-4 col-lg-2">
+                            <div class="text-center">
+                                <div class="display-6 fw-bold 
+                                    {% if score_value >= 80 %}text-success
+                                    {% elif score_value >= 60 %}text-warning
+                                    {% else %}text-danger{% endif %}">
+                                    {{ score_value }}
+                                </div>
+                                <small class="text-muted">{{ score_name.replace('_', ' ').title() }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Technical SEO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> Technical SEO Analysis</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.technical_seo %}
+                    <div class="row g-3">
+                        {% for key, data in results.technical_seo.items() %}
+                        {% if data and not data.get('error') %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="border rounded p-3 h-100">
+                                <h6 class="fw-bold text-capitalize">{{ key.replace('_', ' ') }}</h6>
+                                {% if data.get('status') %}
+                                <span class="badge 
+                                    {% if data.status == 'good' %}bg-success
+                                    {% elif data.status == 'needs_improvement' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ data.status.replace('_', ' ').title() }}
+                                </span>
+                                {% endif %}
+                                {% if data.get('recommendation') %}
+                                <p class="mt-2 mb-0 small text-muted">{{ data.recommendation }}</p>
+                                {% endif %}
+                                {% if data.get('value') %}
+                                <div class="mt-1"><strong>Value:</strong> {{ data.value }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No technical SEO data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- On-Page SEO -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> On-Page SEO Analysis</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.on_page_seo %}
+                    <div class="row g-3">
+                        <!-- Title Tags -->
+                        {% if results.on_page_seo.title_tags %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Title Tag</h6>
+                                <span class="badge 
+                                    {% if results.on_page_seo.title_tags.status == 'good' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ results.on_page_seo.title_tags.status.replace('_', ' ').title() }}
+                                </span>
+                                <p class="mt-2 mb-1 small">{{ results.on_page_seo.title_tags.title[:100] }}...</p>
+                                <small class="text-muted">Length: {{ results.on_page_seo.title_tags.length }} characters</small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Meta Description -->
+                        {% if results.on_page_seo.meta_description %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Meta Description</h6>
+                                <span class="badge 
+                                    {% if results.on_page_seo.meta_description.status == 'good' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ results.on_page_seo.meta_description.status.replace('_', ' ').title() }}
+                                </span>
+                                {% if results.on_page_seo.meta_description.description %}
+                                <p class="mt-2 mb-1 small">{{ results.on_page_seo.meta_description.description[:100] }}...</p>
+                                {% endif %}
+                                <small class="text-muted">Length: {{ results.on_page_seo.meta_description.length }} characters</small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Heading Structure -->
+                        {% if results.on_page_seo.heading_structure %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Heading Structure</h6>
+                                <span class="badge 
+                                    {% if results.on_page_seo.heading_structure.status == 'good' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ results.on_page_seo.heading_structure.status.replace('_', ' ').title() }}
+                                </span>
+                                <div class="mt-2">
+                                    <small>H1 Count: {{ results.on_page_seo.heading_structure.h1_count }}</small><br>
+                                    <small>H2 Count: {{ results.on_page_seo.heading_structure.headings.h2|length }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Image Optimization -->
+                        {% if results.on_page_seo.image_optimization %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Image Optimization</h6>
+                                <span class="badge 
+                                    {% if results.on_page_seo.image_optimization.status == 'good' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ results.on_page_seo.image_optimization.status.replace('_', ' ').title() }}
+                                </span>
+                                <div class="mt-2">
+                                    <small>Total Images: {{ results.on_page_seo.image_optimization.total_images }}</small><br>
+                                    <small>With Alt Text: {{ results.on_page_seo.image_optimization.alt_percentage }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No on-page SEO data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PageSpeed Insights -->
+    {% if results.pagespeed_insights and not results.pagespeed_insights.get('error') %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-tachometer-alt"></i> Google PageSpeed Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Mobile Results -->
+                        {% if results.pagespeed_insights.mobile %}
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Mobile Performance</h6>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="h4 
+                                            {% if results.pagespeed_insights.mobile.performance_score >= 90 %}text-success
+                                            {% elif results.pagespeed_insights.mobile.performance_score >= 50 %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.mobile.performance_score|round|int }}
+                                        </div>
+                                        <small>Performance</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="h4 
+                                            {% if results.pagespeed_insights.mobile.seo_score >= 90 %}text-success
+                                            {% elif results.pagespeed_insights.mobile.seo_score >= 50 %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.mobile.seo_score|round|int }}
+                                        </div>
+                                        <small>SEO</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Core Web Vitals -->
+                            {% if results.pagespeed_insights.mobile.core_web_vitals %}
+                            <h6 class="fw-bold">Core Web Vitals</h6>
+                            <div class="row g-2">
+                                {% if results.pagespeed_insights.mobile.core_web_vitals.lcp %}
+                                <div class="col-4">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="small fw-bold">LCP</div>
+                                        <div class="
+                                            {% if results.pagespeed_insights.mobile.core_web_vitals.lcp.status == 'good' %}text-success
+                                            {% elif results.pagespeed_insights.mobile.core_web_vitals.lcp.status == 'needs_improvement' %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.mobile.core_web_vitals.lcp.displayValue }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if results.pagespeed_insights.mobile.core_web_vitals.cls %}
+                                <div class="col-4">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="small fw-bold">CLS</div>
+                                        <div class="
+                                            {% if results.pagespeed_insights.mobile.core_web_vitals.cls.status == 'good' %}text-success
+                                            {% elif results.pagespeed_insights.mobile.core_web_vitals.cls.status == 'needs_improvement' %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.mobile.core_web_vitals.cls.displayValue }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if results.pagespeed_insights.mobile.core_web_vitals.inp %}
+                                <div class="col-4">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="small fw-bold">INP</div>
+                                        <div class="
+                                            {% if results.pagespeed_insights.mobile.core_web_vitals.inp.status == 'good' %}text-success
+                                            {% elif results.pagespeed_insights.mobile.core_web_vitals.inp.status == 'needs_improvement' %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.mobile.core_web_vitals.inp.displayValue }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Desktop Results -->
+                        {% if results.pagespeed_insights.desktop %}
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Desktop Performance</h6>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="h4 
+                                            {% if results.pagespeed_insights.desktop.performance_score >= 90 %}text-success
+                                            {% elif results.pagespeed_insights.desktop.performance_score >= 50 %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.desktop.performance_score|round|int }}
+                                        </div>
+                                        <small>Performance</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center p-2 border rounded">
+                                        <div class="h4 
+                                            {% if results.pagespeed_insights.desktop.seo_score >= 90 %}text-success
+                                            {% elif results.pagespeed_insights.desktop.seo_score >= 50 %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ results.pagespeed_insights.desktop.seo_score|round|int }}
+                                        </div>
+                                        <small>SEO</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- User Experience & Accessibility -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-purple text-white" style="background-color: #6f42c1 !important;">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> User Experience & Accessibility</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.user_experience %}
+                    <div class="row g-3">
+                        {% if results.user_experience.accessibility %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Accessibility Score</h6>
+                                <div class="display-6 
+                                    {% if results.user_experience.accessibility.accessibility_score >= 70 %}text-success
+                                    {% else %}text-warning{% endif %}">
+                                    {{ results.user_experience.accessibility.accessibility_score }}/100
+                                </div>
+                                <small class="text-muted">{{ results.user_experience.accessibility.recommendation }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if results.user_experience.responsive_design %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Responsive Design</h6>
+                                <span class="badge 
+                                    {% if results.user_experience.responsive_design.status == 'good' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ results.user_experience.responsive_design.status.replace('_', ' ').title() }}
+                                </span>
+                                <div class="mt-2">
+                                    <small>Viewport Meta: 
+                                        {% if results.user_experience.responsive_design.has_viewport_meta %}✓{% else %}✗{% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No user experience data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security & Performance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Security & Performance</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.security_performance %}
+                    <div class="row g-3">
+                        {% if results.security_performance.security_headers %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Security Headers</h6>
+                                <div class="display-6 
+                                    {% if results.security_performance.security_headers.security_score >= 70 %}text-success
+                                    {% else %}text-warning{% endif %}">
+                                    {{ results.security_performance.security_headers.security_score }}/100
+                                </div>
+                                <small class="text-muted">
+                                    {{ results.security_performance.security_headers.headers_present }}/{{ results.security_performance.security_headers.total_possible }} headers present
+                                </small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if results.security_performance.performance_enhancements %}
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold">Performance Enhancements</h6>
+                                <div class="display-6 
+                                    {% if results.security_performance.performance_enhancements.performance_score >= 70 %}text-success
+                                    {% else %}text-warning{% endif %}">
+                                    {{ results.security_performance.performance_enhancements.performance_score }}/100
+                                </div>
+                                <small class="text-muted">{{ results.security_performance.performance_enhancements.recommendation }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No security and performance data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Recommended Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-danger">High Priority</h6>
+                            <ul class="list-unstyled">
+                                {% if results.technical_seo.https_ssl and results.technical_seo.https_ssl.status != 'good' %}
+                                <li class="mb-2"><i class="fas fa-exclamation-triangle text-danger me-2"></i>Fix HTTPS/SSL issues</li>
+                                {% endif %}
+                                {% if results.on_page_seo.title_tags and results.on_page_seo.title_tags.status != 'good' %}
+                                <li class="mb-2"><i class="fas fa-exclamation-triangle text-danger me-2"></i>Optimize title tag length</li>
+                                {% endif %}
+                                {% if results.on_page_seo.meta_description and not results.on_page_seo.meta_description.exists %}
+                                <li class="mb-2"><i class="fas fa-exclamation-triangle text-danger me-2"></i>Add meta description</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-warning">Medium Priority</h6>
+                            <ul class="list-unstyled">
+                                {% if results.technical_seo.structured_data and results.technical_seo.structured_data.total_schemas == 0 %}
+                                <li class="mb-2"><i class="fas fa-exclamation-circle text-warning me-2"></i>Add structured data markup</li>
+                                {% endif %}
+                                {% if results.on_page_seo.image_optimization and results.on_page_seo.image_optimization.alt_percentage < 90 %}
+                                <li class="mb-2"><i class="fas fa-exclamation-circle text-warning me-2"></i>Improve image alt text coverage</li>
+                                {% endif %}
+                                {% if results.security_performance.security_headers and results.security_performance.security_headers.security_score < 70 %}
+                                <li class="mb-2"><i class="fas fa-exclamation-circle text-warning me-2"></i>Implement security headers</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg btn-custom me-3">
+                <i class="fas fa-plus"></i> New Audit
+            </a>
+            <a href="{{ url_for('download_json', audit_id=audit_id) }}" class="btn btn-outline-primary btn-lg btn-custom">
+                <i class="fas fa-download"></i> Download Report
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Add tooltips to badges and scores
+    $('[data-bs-toggle="tooltip"]').tooltip();
+    
+    // Add smooth scrolling
+    $('a[href^="#"]').on('click', function(event) {
+        var target = $(this.getAttribute('href'));
+        if( target.length ) {
+            event.preventDefault();
+            $('html, body').stop().animate({
+                scrollTop: target.offset().top - 100
+            }, 1000);
+        }
+    });
+});
+</script>
+{% endblock %}
