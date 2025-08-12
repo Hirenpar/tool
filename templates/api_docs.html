@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - SEO Audit Tool{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4"><i class="fas fa-book"></i> API Documentation</h1>
+            <p class="lead mb-5">Complete reference for the SEO Audit Tool API endpoints.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card card-custom position-sticky" style="top: 100px;">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">Table of Contents</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><a href="#overview" class="text-decoration-none">Overview</a></li>
+                        <li><a href="#authentication" class="text-decoration-none">Authentication</a></li>
+                        <li><a href="#endpoints" class="text-decoration-none">Endpoints</a></li>
+                        <li><a href="#response-format" class="text-decoration-none">Response Format</a></li>
+                        <li><a href="#examples" class="text-decoration-none">Examples</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- Overview -->
+            <section id="overview" class="mb-5">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h3 class="mb-0">Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>The SEO Audit Tool API provides comprehensive website analysis including:</p>
+                        <ul>
+                            <li>Technical SEO analysis</li>
+                            <li>On-page SEO evaluation</li>
+                            <li>User experience metrics</li>
+                            <li>Security and performance checks</li>
+                            <li>Google PageSpeed Insights integration</li>
+                        </ul>
+                        <p><strong>Base URL:</strong> <code>http://localhost:5000</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section id="authentication" class="mb-5">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h3 class="mb-0">Authentication</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Currently, the API does not require authentication. However, for Google PageSpeed Insights integration, you'll need to provide an API key.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Get your free Google PageSpeed Insights API key at: 
+                            <a href="https://developers.google.com/speed/docs/insights/v5/get-started" target="_blank">
+                                Google Developers Console
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Endpoints -->
+            <section id="endpoints" class="mb-5">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h3 class="mb-0">API Endpoints</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Start Audit -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-success">POST</span> /audit</h5>
+                            <p>Start a new SEO audit for a website.</p>
+                            
+                            <h6>Request Body:</h6>
+                            <pre><code>{
+  "url": "https://example.com",
+  "api_key": "your_pagespeed_api_key" // optional
+}</code></pre>
+
+                            <h6>Response:</h6>
+                            <pre><code>{
+  "audit_id": "audit_20241213_123456_1234",
+  "message": "Audit started successfully",
+  "status": "running"
+}</code></pre>
+                        </div>
+
+                        <!-- Check Status -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-primary">GET</span> /audit/{audit_id}/status</h5>
+                            <p>Check the status of a running audit.</p>
+                            
+                            <h6>Response:</h6>
+                            <pre><code>{
+  "status": "completed", // or "running"
+  "audit_id": "audit_20241213_123456_1234"
+}</code></pre>
+                        </div>
+
+                        <!-- Get Results -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-primary">GET</span> /audit/{audit_id}/results</h5>
+                            <p>Get the complete audit results in JSON format.</p>
+                            
+                            <h6>Response:</h6>
+                            <pre><code>{
+  "url": "https://example.com",
+  "domain": "example.com",
+  "audit_timestamp": "2024-12-13T12:34:56",
+  "technical_seo": { ... },
+  "on_page_seo": { ... },
+  "off_page_seo": { ... },
+  "user_experience": { ... },
+  "security_performance": { ... },
+  "pagespeed_insights": { ... },
+  "scores": { ... }
+}</code></pre>
+                        </div>
+
+                        <!-- Download JSON -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-primary">GET</span> /audit/{audit_id}/download/json</h5>
+                            <p>Download audit results as a JSON file.</p>
+                        </div>
+
+                        <!-- Download CSV -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-primary">GET</span> /audit/{audit_id}/download/csv</h5>
+                            <p>Download audit results as a CSV file.</p>
+                        </div>
+
+                        <!-- Health Check -->
+                        <div class="mb-4">
+                            <h5><span class="badge bg-primary">GET</span> /health</h5>
+                            <p>Check the API health status.</p>
+                            
+                            <h6>Response:</h6>
+                            <pre><code>{
+  "status": "healthy",
+  "timestamp": "2024-12-13T12:34:56",
+  "version": "1.0.0"
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Response Format -->
+            <section id="response-format" class="mb-5">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h3 class="mb-0">Response Format</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Success Response</h5>
+                        <p>All successful responses return JSON with appropriate HTTP status codes (200, 201, etc.).</p>
+
+                        <h5>Error Response</h5>
+                        <p>Error responses include an error message:</p>
+                        <pre><code>{
+  "error": "Error message description"
+}</code></pre>
+
+                        <h5>Status Indicators</h5>
+                        <ul>
+                            <li><code>good</code> - No issues found</li>
+                            <li><code>needs_improvement</code> - Minor issues that should be addressed</li>
+                            <li><code>poor</code> - Major issues requiring immediate attention</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples -->
+            <section id="examples" class="mb-5">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h3 class="mb-0">Usage Examples</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>JavaScript/Ajax Example</h5>
+                        <pre><code>// Start audit
+fetch('/audit', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    url: 'https://example.com',
+    api_key: 'your_api_key' // optional
+  })
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Audit started:', data.audit_id);
+  
+  // Check status periodically
+  checkStatus(data.audit_id);
+});
+
+function checkStatus(auditId) {
+  fetch(`/audit/${auditId}/status`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'completed') {
+        // Get results
+        window.location.href = `/audit/${auditId}/report`;
+      } else {
+        // Check again in 3 seconds
+        setTimeout(() => checkStatus(auditId), 3000);
+      }
+    });
+}</code></pre>
+
+                        <h5>cURL Example</h5>
+                        <pre><code># Start audit
+curl -X POST http://localhost:5000/audit \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+
+# Check status
+curl http://localhost:5000/audit/audit_20241213_123456_1234/status
+
+# Get results
+curl http://localhost:5000/audit/audit_20241213_123456_1234/results</code></pre>
+
+                        <h5>Python Example</h5>
+                        <pre><code>import requests
+import time
+
+# Start audit
+response = requests.post('http://localhost:5000/audit', json={
+    'url': 'https://example.com',
+    'api_key': 'your_api_key'  # optional
+})
+
+audit_data = response.json()
+audit_id = audit_data['audit_id']
+
+# Wait for completion
+while True:
+    status_response = requests.get(f'http://localhost:5000/audit/{audit_id}/status')
+    status_data = status_response.json()
+    
+    if status_data['status'] == 'completed':
+        # Get results
+        results_response = requests.get(f'http://localhost:5000/audit/{audit_id}/results')
+        results = results_response.json()
+        print("Audit completed!")
+        break
+    
+    time.sleep(3)</code></pre>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

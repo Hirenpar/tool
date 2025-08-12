@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Audit Tool - Comprehensive Website Analysis{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="fas fa-chart-line"></i> Advanced SEO Audit Tool
+        </h1>
+        <p class="lead mb-5">
+            Comprehensive SEO analysis covering Technical SEO, On-Page optimization, 
+            User Experience, Performance, and more. Get actionable insights to improve your website's search rankings.
+        </p>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-body p-5">
+                        <h3 class="card-title text-dark mb-4">
+                            <i class="fas fa-globe"></i> Start Your SEO Audit
+                        </h3>
+                        
+                        <form id="auditForm">
+                            <div class="mb-4">
+                                <label for="website-url" class="form-label fw-bold">Website URL</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                    <input type="url" class="form-control" id="website-url" 
+                                           placeholder="https://example.com" required>
+                                </div>
+                                <div class="form-text">Enter the full URL including https://</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="api-key" class="form-label fw-bold">
+                                    Google PageSpeed Insights API Key 
+                                    <span class="badge bg-secondary">Optional</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <input type="password" class="form-control" id="api-key" 
+                                           placeholder="Enter your API key for detailed PageSpeed analysis">
+                                </div>
+                                <div class="form-text">
+                                    <a href="https://developers.google.com/speed/docs/insights/v5/get-started" 
+                                       target="_blank" class="text-decoration-none">
+                                        Get your free API key here <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg btn-custom w-100">
+                                <i class="fas fa-rocket"></i> Start SEO Audit
+                            </button>
+                        </form>
+                        
+                        <div id="audit-progress" class="audit-progress mt-4">
+                            <div class="alert alert-info">
+                                <div class="d-flex align-items-center">
+                                    <div class="spinner-border spinner-border-sm me-3" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="alert-heading mb-1">Audit in Progress</h6>
+                                        <p class="mb-0">Analyzing your website... This may take 30-60 seconds.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div id="progress-text" class="text-center text-muted">
+                                Starting audit...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12 text-center mb-5">
+            <h2 class="fw-bold">What Our SEO Audit Covers</h2>
+            <p class="lead text-muted">Comprehensive analysis across all critical SEO factors</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-cogs fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Technical SEO</h5>
+                    <p class="card-text">
+                        Page speed, Core Web Vitals, mobile-friendliness, HTTPS, indexability, 
+                        XML sitemaps, robots.txt, canonical tags, and structured data analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-edit fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">On-Page SEO</h5>
+                    <p class="card-text">
+                        Title tags, meta descriptions, heading structure, keyword optimization, 
+                        image alt text, internal linking, and content quality analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-link fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title">Off-Page SEO</h5>
+                    <p class="card-text">
+                        Domain authority estimation, social media signals, 
+                        backlink analysis recommendations, and trust indicators.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-users fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">User Experience</h5>
+                    <p class="card-text">
+                        Mobile responsiveness, navigation analysis, accessibility features, 
+                        and overall user experience optimization.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="card-title">Security & Performance</h5>
+                    <p class="card-text">
+                        Security headers, performance enhancements, CDN usage, 
+                        compression, caching, and optimization recommendations.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-tachometer-alt fa-3x text-purple"></i>
+                    </div>
+                    <h5 class="card-title">PageSpeed Insights</h5>
+                    <p class="card-text">
+                        Complete Google PageSpeed Insights integration with detailed 
+                        Core Web Vitals, performance metrics, and optimization opportunities.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h3 class="fw-bold mb-3">Why Use Our SEO Audit Tool?</h3>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Comprehensive analysis in one place</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Actionable recommendations</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Export results as JSON or CSV</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Google PageSpeed Insights integration</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Free to use</li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-chart-pie fa-5x text-primary mb-3"></i>
+                    <h4>Get Started Today</h4>
+                    <p class="text-muted">Improve your website's SEO performance with our comprehensive audit tool.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    let currentAuditId = null;
+    let progressInterval = null;
+    
+    $('#auditForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const url = $('#website-url').val().trim();
+        const apiKey = $('#api-key').val().trim();
+        
+        if (!url) {
+            alert('Please enter a website URL');
+            return;
+        }
+        
+        // Show progress
+        $('#audit-progress').show();
+        $('#auditForm button[type="submit"]').prop('disabled', true);
+        
+        // Start progress animation
+        animateProgress();
+        
+        // Start audit
+        $.ajax({
+            url: '/audit',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                url: url,
+                api_key: apiKey
+            }),
+            success: function(response) {
+                currentAuditId = response.audit_id;
+                checkAuditStatus();
+            },
+            error: function(xhr) {
+                hideProgress();
+                const error = xhr.responseJSON ? xhr.responseJSON.error : 'An error occurred';
+                alert('Error: ' + error);
+            }
+        });
+    });
+    
+    function animateProgress() {
+        let progress = 0;
+        const messages = [
+            'Starting audit...',
+            'Fetching page content...',
+            'Analyzing Technical SEO...',
+            'Checking On-Page SEO...',
+            'Evaluating User Experience...',
+            'Testing Security & Performance...',
+            'Running PageSpeed Insights...',
+            'Generating report...'
+        ];
+        
+        progressInterval = setInterval(function() {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            $('.progress-bar').css('width', progress + '%');
+            
+            const messageIndex = Math.floor(progress / 12.5);
+            if (messageIndex < messages.length) {
+                $('#progress-text').text(messages[messageIndex]);
+            }
+        }, 2000);
+    }
+    
+    function checkAuditStatus() {
+        if (!currentAuditId) return;
+        
+        $.ajax({
+            url: `/audit/${currentAuditId}/status`,
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'completed') {
+                    // Audit completed
+                    clearInterval(progressInterval);
+                    $('.progress-bar').css('width', '100%');
+                    $('#progress-text').text('Audit completed! Redirecting to results...');
+                    
+                    setTimeout(function() {
+                        window.location.href = `/audit/${currentAuditId}/report`;
+                    }, 1500);
+                } else {
+                    // Still running, check again
+                    setTimeout(checkAuditStatus, 3000);
+                }
+            },
+            error: function() {
+                setTimeout(checkAuditStatus, 5000);
+            }
+        });
+    }
+    
+    function hideProgress() {
+        $('#audit-progress').hide();
+        $('#auditForm button[type="submit"]').prop('disabled', false);
+        clearInterval(progressInterval);
+        $('.progress-bar').css('width', '0%');
+    }
+});
+</script>
+{% endblock %}
